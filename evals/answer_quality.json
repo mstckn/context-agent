@@ -1,0 +1,47 @@
+[
+  {
+    "name": "auth token verification",
+    "question": "How does the project verify an authentication token?",
+    "expected_files": ["auth/tokens.py", "auth/service.py"]
+  },
+  {
+    "name": "rate limiting login endpoint",
+    "question": "Add rate limiting to the login endpoint to prevent brute force",
+    "expected_files": ["auth/service.py", "auth/decorators.py"]
+  },
+  {
+    "name": "refactor user model",
+    "question": "Refactor the user model to use a dataclass and add a deactivation method",
+    "expected_files": ["auth/models.py"]
+  },
+  {
+    "name": "create new invoice",
+    "question": "Create a new invoice for a customer with multiple line items",
+    "expected_files": ["payments/service.py", "payments/models.py"]
+  },
+  {
+    "name": "process refund",
+    "question": "Process a partial refund for an already-paid invoice",
+    "expected_files": ["payments/service.py", "payments/models.py"]
+  },
+  {
+    "name": "track analytics event",
+    "question": "Track a new user-signup analytics event with timestamp",
+    "expected_files": ["analytics/events.py"]
+  },
+  {
+    "name": "database transaction",
+    "question": "Wrap a database write in a transaction with rollback on error",
+    "expected_files": ["db/connection.py"]
+  },
+  {
+    "name": "logger factory",
+    "question": "Get a configured logger for the auth module",
+    "expected_files": ["utils/logging.py"]
+  },
+  {
+    "name": "add CLI command",
+    "question": "Add a new 'rollback' command to the CLI for the sample project",
+    "expected_files": ["cli/commands.py"]
+  }
+]

@@ -1,0 +1,2695 @@
+You are extending the existing Premium Context Intelligence project.
+
+This is the next implementation phase.
+
+The existing Context Intelligence Core has already completed a major upgrade and has received a GO acceptance verdict.
+
+Your task is NOT to redesign the Context Intelligence engine again.
+
+Your task is to build the next product layer around the verified core:
+
+* unified Dashboard / Control Plane
+* project/global/session configuration
+* cross-IDE continuity verification and completion
+* optional Router MCP
+* provider/model configuration
+* Hybrid delegation
+* future/optional true Auto Router through a Model Gateway
+* usage/cost/routing observability
+
+without destabilizing the existing Context Intelligence Core.
+
+---
+
+# 0. CURRENT VERIFIED BASELINE — PROTECTED CORE
+
+Treat the current Context Intelligence implementation as a PROTECTED BASELINE.
+
+The latest verified results include approximately:
+
+* Routing hit rate: 1.00
+* Top-1 routing accuracy: 8/8 = 1.00
+* Answer-quality evaluation: 9/9
+* Answer overlap: 1.00
+* Noise: 0.00
+* Repository tests: 101/101 passing
+* Testbed tests: 12/12 passing
+* Average per-query context savings: 65.4%
+* Migration retrieval: top-1
+* Large-file retrieval: preview + chunk_map verified
+* Cross-turn Context Ledger reuse verified
+* Known-context token savings verified across consecutive turns
+
+The implementation already contains important Context Intelligence capabilities including:
+
+* task-aware retrieval
+* content-level retrieval
+* structural/dependency graph
+* project memory
+* cross-turn context ledger
+* context decay/reuse
+* model-aware budgeting
+* sufficiency/coverage logic
+* progressive context expansion
+* large-file preview/chunk maps
+* diagnostics/explainability
+* Git-aware/project-aware context mechanisms
+
+Do NOT duplicate these systems in Router MCP.
+
+Do NOT create:
+
+* another project memory system
+* another context ledger
+* another retrieval engine
+* another dependency graph
+* another task classification engine
+
+unless there is a proven architectural gap that cannot be solved by extending the existing contract.
+
+---
+
+# PROTECTED CORE RULE
+
+The following areas should remain unchanged unless integration objectively requires modification:
+
+* retrieval ranking
+* route scoring
+* content indexing
+* structural graph generation
+* Context Ledger semantics
+* context decay
+* project memory semantics
+* sufficiency engine
+* progressive expansion
+* token budgeting
+* large-file retrieval
+* existing Context MCP tools
+
+If any protected component must change:
+
+1. explain why
+2. make the smallest backward-compatible change
+3. add regression coverage
+4. rerun all existing quality gates
+
+Do not perform opportunistic refactoring of the Context Core during this phase.
+
+---
+
+# MANDATORY REGRESSION FLOOR
+
+At the end of this implementation, rerun at minimum:
+
+* routing evaluation
+* answer-quality evaluation
+* repository tests
+* testbed tests
+* token-savings benchmark
+* cross-turn Context Ledger reuse
+* migration retrieval
+* large-file preview/chunk-map behavior
+
+Return NO-GO if unexplained regression occurs in:
+
+* retrieval quality
+* context accuracy
+* context reuse
+* context savings
+* sufficiency
+* project isolation
+* Context MCP independence
+
+---
+
+# 1. PRODUCT ARCHITECTURE
+
+The product must have a modular architecture.
+
+Target:
+
+```
+                 CONTEXT PLATFORM
+                        |
+         +--------------+--------------+
+         |                             |
+ Context Intelligence            Model Routing
+       CORE                       OPTIONAL
+         |                             |
+    Context MCP                    Router MCP
+         |                             |
+         |                        Model Gateway
+         |                             |
+         |                    Provider Adapters
+         |                  /    |    |    |    \
+         |               MiMo  Qwen  GPT Claude Custom
+         |
+         +------------- Dashboard -------------+
+```
+
+The product should appear as ONE application to the user.
+
+Internally these capabilities must remain separable.
+
+Dependency direction MUST be:
+
+Router MCP
+↓
+Context Intelligence
+
+NOT:
+
+Context Intelligence
+↓
+Router MCP
+
+Context Intelligence must work fully when:
+
+* Router MCP is disabled
+* Router MCP is unavailable
+* Model Gateway is unavailable
+* no AI provider has been configured
+* no API key has been configured
+
+---
+
+# 2. THREE MODEL EXECUTION MODES
+
+The Dashboard must expose three clearly different modes:
+
+MODEL EXECUTION
+
+● IDE MODEL
+
+○ HYBRID
+
+○ AUTO ROUTER
+
+The DEFAULT must be:
+
+IDE MODEL
+
+---
+
+# MODE 1 — IDE MODEL
+
+Description:
+
+"Use the model selected in my IDE."
+
+This is the core product mode.
+
+Behavior:
+
+Context Intelligence = ON
+
+Router MCP execution = OFF
+
+Model Gateway = NOT REQUIRED
+
+External API keys = NOT REQUIRED
+
+The user continues using:
+
+TREA
+VS Code
+Cursor
+Claude Code
+Codex
+or another compatible coding environment
+
+with whatever LLM is already configured in that IDE.
+
+Flow:
+
+IDE-selected LLM
+|
+v
+Context MCP
+|
+v
+optimized context
+|
+v
+IDE-selected LLM continues work
+
+Context Intelligence must remain valuable and complete even if the user NEVER enables Model Routing.
+
+Primary product promise:
+
+"Use your existing coding agent with dramatically less unnecessary context."
+
+---
+
+# MODE 2 — HYBRID
+
+Description:
+
+"Keep my IDE model as the primary agent, but allow optional delegation to other configured models."
+
+The IDE's own LLM remains the primary coding agent.
+
+Router MCP may execute delegated subtasks.
+
+Example:
+
+Claude in IDE
+|
+| delegates repetitive task
+v
+Router MCP
+|
+v
+MiMo
+|
+v
+result returned to Claude
+
+Suitable delegated work may include:
+
+* repetitive edits
+* mechanical refactoring
+* secondary analysis
+* inexpensive review
+* specialized model tasks
+* explicit user delegation
+
+Hybrid mode must NOT pretend that Router MCP transparently replaced the IDE's original primary model call.
+
+The IDE model was still invoked first.
+
+This distinction must be reflected accurately in architecture, UI, docs, and telemetry.
+
+---
+
+# MODE 3 — AUTO ROUTER
+
+Description:
+
+"Automatically choose the most appropriate configured model before execution."
+
+TRUE Auto Router requires a Model Gateway or another integration capable of controlling the primary model request.
+
+MCP alone is not sufficient to transparently intercept and replace the IDE's primary model.
+
+Do NOT fake this.
+
+Target flow:
+
+IDE
+↓
+Model Gateway
+↓
+Task Intelligence
+↓
+Context Intelligence
+↓
+Router
+↓
+Selected Model
+↓
+Provider
+
+Only claim AUTO ROUTER as operational when an actual Gateway/integration controls the primary model request.
+
+Otherwise report:
+
+AUTO ROUTER NOT AVAILABLE FOR THIS IDE CONFIGURATION
+
+while still allowing:
+
+IDE MODEL
+
+and:
+
+HYBRID
+
+---
+
+# 3. CONTEXT MCP REMAINS THE CORE PRODUCT
+
+Context MCP remains responsible for:
+
+* project identity
+* repository identity
+* project memory
+* task state
+* content retrieval
+* structural/dependency graph
+* context selection
+* Context Ledger
+* context decay
+* sufficiency
+* progressive expansion
+* token budgeting
+* Git state
+* runtime evidence
+* project continuity
+* context diagnostics
+* token optimization
+
+Context MCP MUST NOT require:
+
+* OpenAI API key
+* Anthropic API key
+* Alibaba API key
+* OpenRouter API key
+* Ollama
+* Model Router
+* Model Gateway
+
+Keep it deterministic/local-first wherever practical.
+
+---
+
+# 4. ROUTER MCP — OPTIONAL EXECUTION LAYER
+
+Create or prepare a separately enableable Router MCP capability.
+
+Router MCP owns:
+
+* provider configuration
+* provider health
+* model catalog
+* model capability profiles
+* model selection policy
+* routing decisions
+* Hybrid delegation
+* escalation
+* provider execution
+* routing history
+* model usage
+* model cost
+* fallback policy
+* route diagnostics
+
+Router MCP should consume existing machine-readable Context Intelligence output.
+
+Relevant signals may include:
+
+task_type
+task_complexity
+task_risk
+ambiguity
+reasoning_requirement
+architectural_breadth
+dependency_breadth
+context_requirement
+context_confidence
+safe_to_implement
+verification_requirement
+
+Do not reclassify the task independently when Context Intelligence already has reliable information.
+
+If additional metadata is needed, minimally extend the Context Intelligence contract.
+
+---
+
+# 5. MODEL GATEWAY — OPTIONAL TRUE AUTO ROUTER
+
+Design the Model Gateway as an optional component.
+
+Prefer an OpenAI-compatible interface where appropriate and actually testable.
+
+Potential API surface:
+
+/v1/models
+
+/v1/chat/completions
+
+and/or the modern equivalent needed by target IDEs.
+
+Do not claim compatibility without real verification.
+
+Gateway responsibilities may include:
+
+* request normalization
+* router invocation
+* provider selection
+* model execution
+* streaming
+* tool-call normalization
+* cancellation
+* usage accounting
+* fallback
+* provider error normalization
+
+Do NOT move Context Intelligence into the Gateway.
+
+Gateway consumes Context Intelligence.
+
+---
+
+# STREAMING
+
+Coding IDE usage requires proper streaming.
+
+When Gateway is implemented:
+
+* preserve downstream streaming
+* do not buffer entire responses unnecessarily
+* propagate cancellation
+* support streaming tool-call deltas where applicable
+
+---
+
+# TOOL CAPABILITY
+
+Do not route a coding-agent request to a model that lacks required capabilities.
+
+Capabilities may include:
+
+CODING
+REASONING
+TOOLS
+STRUCTURED_OUTPUT
+LONG_CONTEXT
+VISION
+EMBEDDING
+
+Router must filter ineligible models before comparing cost.
+
+---
+
+# 6. ROUTER GOAL
+
+Do NOT optimize:
+
+"always use the cheapest model."
+
+Optimize approximately:
+
+LOWEST EXPECTED COST TO A CORRECT VERIFIED RESULT.
+
+Consider:
+
+* model call cost
+* retry probability
+* escalation probability
+* validation cost
+* task risk
+* model capability
+* previous failures
+* expected success probability
+
+Example:
+
+A cheap model requiring three retries may cost more than using a stronger model once.
+
+Start deterministic.
+
+Do not build speculative machine learning for router decisions in this phase.
+
+Collect telemetry first.
+
+---
+
+# 7. ROUTING MUST NOT BE BASED ON TASK SIZE ALONE
+
+A three-line authorization fix may be CRITICAL.
+
+A 50-file formatting change may be LOW reasoning complexity.
+
+Router should consider:
+
+task type
+complexity
+risk
+ambiguity
+reasoning depth
+architectural breadth
+dependency breadth
+context requirement
+tool requirement
+verification requirement
+previous failures
+model capability
+provider health
+configured cost policy
+
+---
+
+# 8. MODEL TIERS
+
+Do not hardcode assumptions such as:
+
+GPT = strong
+
+MiMo = cheap
+
+Create provider-independent tiers.
+
+Suggested:
+
+ECONOMY
+BALANCED
+STRONG
+FRONTIER
+
+A model profile may contain:
+
+model_id
+provider_id
+display_name
+remote_model_name
+context_window
+max_output
+input_cost
+output_cost
+latency_class
+quality_tier
+capabilities
+enabled
+
+Allow manual configuration.
+
+The ecosystem changes rapidly.
+
+New models should not require application releases.
+
+---
+
+# 9. PROVIDERS
+
+Support provider abstraction.
+
+Built-in adapters where practical:
+
+OpenAI
+
+Anthropic
+
+Alibaba / DashScope
+
+OpenRouter
+
+Ollama
+
+OpenAI-Compatible Endpoint
+
+Custom provider architecture should remain extensible.
+
+Conceptual:
+
+ModelProvider
+├── OpenAIAdapter
+├── AnthropicAdapter
+├── AlibabaAdapter
+├── OpenRouterAdapter
+├── OllamaAdapter
+└── OpenAICompatibleAdapter
+
+---
+
+# 10. API KEY / SECRET SECURITY
+
+This is mandatory.
+
+Provider credentials belong only to routing/gateway infrastructure.
+
+Context Intelligence must NOT need provider secrets.
+
+Never place API keys in:
+
+* repository files
+* Context MCP output
+* Context Ledger
+* Project Memory
+* prompts
+* logs
+* routing traces
+* usage events
+* diagnostics exports
+* frontend GET responses
+
+Prefer:
+
+OS keychain / credential store
+
+or:
+
+encrypted secret-store abstraction.
+
+Separate:
+
+ProviderConfig
+
+from:
+
+ProviderSecret
+
+Stored keys must never be displayed back to the user.
+
+Show only masked state.
+
+Support:
+
+Replace Key
+
+Delete Key
+
+Test Connection
+
+---
+
+# 11. PROVIDER HEALTH
+
+Show states such as:
+
+CONNECTED
+
+UNAVAILABLE
+
+AUTHENTICATION_FAILED
+
+RATE_LIMITED
+
+UNKNOWN
+
+Store:
+
+last successful health check
+last error category
+
+Avoid expensive generation just to test connectivity when a lightweight endpoint is available.
+
+---
+
+# 12. DASHBOARD = CONTROL PLANE
+
+The Dashboard configures and observes the platform.
+
+It is NOT the routing engine.
+
+Runtime logic remains backend-side.
+
+Inspect the existing Dashboard first.
+
+If one already exists:
+
+EXTEND IT.
+
+Do not build a second unrelated dashboard.
+
+The product should have ONE coherent UI.
+
+Suggested navigation:
+
+Overview
+
+Projects
+
+Context Intelligence
+
+Project Memory
+
+IDE Sessions
+
+Model Execution
+
+AI Providers
+
+Models
+
+Auto Router
+
+Usage & Cost
+
+Routing History
+
+Diagnostics
+
+Settings
+
+---
+
+# 13. DASHBOARD — OVERVIEW
+
+Show concise cards:
+
+Context Intelligence
+ACTIVE / OFF
+
+Model Execution
+IDE MODEL / HYBRID / AUTO ROUTER
+
+Current Project
+
+Connected IDE
+
+Current IDE Model if detectable
+
+Context Confidence
+
+Context Tokens Saved
+
+Context Reuse
+
+Project Memory Health
+
+Active Task
+
+When routing enabled also show:
+
+Current routed model
+
+Provider health
+
+API cost
+
+Escalations
+
+Routing failures
+
+Do not overwhelm users.
+
+---
+
+# 14. FIRST-RUN ONBOARDING
+
+Do not force routing configuration.
+
+Suggested:
+
+STEP 1
+Welcome
+
+STEP 2
+Detect project / IDE
+
+STEP 3
+Model Execution
+
+Question:
+
+"How would you like to use Context Intelligence?"
+
+RECOMMENDED:
+
+USE MY IDE MODEL
+
+"No external API keys required."
+
+Optional:
+
+ENABLE MODEL ROUTING
+
+"Connect additional models/providers for delegation or automatic routing."
+
+The user must be able to finish onboarding without entering any provider key.
+
+---
+
+# 15. GLOBAL / PROJECT / SESSION / TASK CONFIGURATION
+
+Support hierarchical configuration.
+
+Priority:
+
+SYSTEM
+↓
+GLOBAL
+↓
+PROJECT
+↓
+SESSION
+↓
+TASK
+
+Dashboard must show effective values and their source.
+
+Example:
+
+Execution Mode:
+AUTO ROUTER
+source: Project
+
+Architecture Model:
+GPT-5.6
+source: Global
+
+Task Override:
+Force STRONG
+source: Task
+
+Provide:
+
+VIEW EFFECTIVE CONFIGURATION
+
+RESET TO INHERITED
+
+Configuration behavior must never be invisible.
+
+---
+
+# 16. PROJECT-SPECIFIC EXECUTION MODE
+
+Allow:
+
+Global:
+IDE MODEL
+
+Project A:
+AUTO ROUTER
+
+Project B:
+HYBRID
+
+Project C:
+inherit global
+
+Routing preferences belong to the project/global configuration layer.
+
+They must NOT belong to a specific IDE.
+
+Opening Project A from another IDE should retain its routing configuration.
+
+---
+
+# 17. USER TASK OVERRIDES
+
+Allow temporary overrides:
+
+USE AUTO
+
+USE IDE MODEL FOR THIS TASK
+
+FORCE MODEL
+
+FORCE TIER
+
+Overrides should apply to TASK or SESSION only.
+
+Do not mutate project/global defaults.
+
+---
+
+# 18. SMART ROUTER CONFIGURATION
+
+For ordinary users provide:
+
+SMART
+
+CUSTOM
+
+SMART:
+
+Primary economy model:
+MiMo
+
+Balanced model:
+Qwen
+
+Strong model:
+GPT-5.6
+
+Frontier:
+user-selected model
+
+Optimization:
+
+Lowest Cost
+Balanced
+Highest Quality
+
+Auto Escalation:
+ON/OFF
+
+Maximum Escalations
+
+Maximum Cost / Task
+
+Critical Task Minimum Tier
+
+These are examples.
+
+Do not hardcode model names.
+
+---
+
+# 19. CUSTOM ROUTER POLICY
+
+Advanced users may configure a matrix.
+
+Example:
+
+| Task Type    | Preferred Tier | Fallback |
+| ------------ | -------------- | -------- |
+| LOCAL_EDIT   | ECONOMY        | BALANCED |
+| BUG_FIX      | BALANCED       | STRONG   |
+| FEATURE      | BALANCED       | STRONG   |
+| REFACTOR     | STRONG         | FRONTIER |
+| ARCHITECTURE | STRONG         | FRONTIER |
+| SECURITY     | FRONTIER       | —        |
+
+Also risk policies:
+
+LOW → economy allowed
+
+MEDIUM → balanced+
+
+HIGH → strong+
+
+CRITICAL → strong/frontier only
+
+Do not expose dozens of internal numeric thresholds in default UX.
+
+---
+
+# 20. AUTO ESCALATION
+
+Support escalation:
+
+ECONOMY
+↓
+BALANCED
+↓
+STRONG
+↓
+FRONTIER
+
+Potential escalation triggers:
+
+implementation validation failure
+repeated task failure
+model uncertainty
+discovered architecture complexity
+risk increase
+missing capability
+verification failure
+
+But do NOT automatically escalate for:
+
+network failure
+package install failure
+broken test runner
+environment misconfiguration
+
+Classify failure source where possible.
+
+---
+
+# 21. COST GUARDRAILS
+
+Allow:
+
+Per-task limit
+
+Daily limit
+
+Monthly limit
+
+Maximum escalation tier
+
+Behavior options:
+
+WARN
+
+BLOCK
+
+ECONOMY_ONLY
+
+REQUIRE_MANUAL_OVERRIDE
+
+Hard limits must not be exceeded silently.
+
+---
+
+# 22. QUALITY GUARDRAILS
+
+Cost must not silently force unsafe model routing.
+
+Example:
+
+SECURITY task requires STRONG.
+
+Only ECONOMY model allowed.
+
+Return:
+
+ROUTING BLOCKED
+
+Reason:
+
+No configured model satisfies minimum capability/risk policy.
+
+Never pretend the economy model is adequate.
+
+---
+
+# 23. CONTEXT-FIRST ROUTING
+
+Routing should cooperate with Context Intelligence.
+
+Recommended two-stage planning:
+
+USER TASK
+↓
+TASK INTELLIGENCE
+↓
+INITIAL CONTEXT REQUIREMENT
+↓
+RISK / COMPLEXITY
+↓
+MODEL REQUIREMENT
+↓
+ROUTER
+↓
+MODEL SELECTED
+↓
+FINAL CONTEXT BUDGET ADAPTED TO MODEL
+↓
+CONTEXT PACKAGE
+↓
+MODEL
+
+Do not create circular architecture.
+
+---
+
+# 24. MODEL CONTEXT PROFILE
+
+Router should expose model capacity to Context Intelligence.
+
+Example:
+
+ModelContextProfile {
+model
+context_window
+max_output
+tool_overhead
+reasoning_reserve
+safe_input_budget
+}
+
+Context Intelligence then adapts context size appropriately.
+
+Unknown models must use conservative defaults.
+
+---
+
+# 25. HYBRID ROUTER MCP TOOLS
+
+Where appropriate expose simple tools such as conceptually:
+
+route_task
+
+delegate_task
+
+execute_with_model
+
+get_model_candidates
+
+explain_route
+
+Do not expose unnecessary provider internals to the coding model.
+
+---
+
+# 26. ROUTING HISTORY
+
+Every routed/delegated task should create a record.
+
+Example:
+
+Task:
+Fix payment retry race
+
+Task Type:
+BUG_FIX
+
+Risk:
+HIGH
+
+Initial:
+Qwen
+
+Escalated:
+GPT-5.6
+
+Reason:
+Two implementation validation failures
+
+Final:
+PASS
+
+Context Tokens:
+...
+
+Model Tokens:
+...
+
+Cost:
+...
+
+Duration:
+...
+
+Policy Version:
+...
+
+Do not store private chain-of-thought.
+
+Only deterministic/observable routing reasons.
+
+---
+
+# 27. ROUTER DECISION EXPLAINABILITY
+
+Provide concise deterministic explanations.
+
+Example:
+
+Selected Qwen because:
+
+FEATURE
+MEDIUM complexity
+LOW security risk
+cross-file implementation
+Qwen satisfies required tools
+lower expected cost than STRONG tier
+
+This should be available in Dashboard diagnostics.
+
+Do not inject verbose routing explanations into normal model context.
+
+---
+
+# 28. PROJECT IDENTITY / CROSS-IDE CONTINUITY
+
+This is CRITICAL.
+
+Before adding Router assumptions, inspect and verify the actual identity system.
+
+Required logical identities or robust equivalents:
+
+PROJECT_ID
+
+REPOSITORY_ID
+
+CHECKOUT_ID
+
+BRANCH / REVISION
+
+IDE_INSTANCE_ID
+
+CONVERSATION_ID
+
+MODEL_SESSION_ID
+
+TASK_ID
+
+Do not duplicate existing identities unnecessarily.
+
+---
+
+# PROJECT MEMORY != MODEL KNOWLEDGE
+
+These must remain separate.
+
+PROJECT KNOWLEDGE can persist across IDEs.
+
+MODEL KNOWLEDGE belongs to a model session.
+
+Example:
+
+Project Memory:
+
+"Authentication uses sessions."
+
+Can be shared.
+
+Known-to-model:
+
+"auth/service.py lines 80–160 were already sent."
+
+Must NOT automatically transfer to a new model session.
+
+---
+
+# 29. REQUIRED CROSS-IDE ACCEPTANCE
+
+Explicitly prove:
+
+IDE A
+→ Project X
+→ work performed
+→ state updated
+
+then:
+
+IDE B
+→ same Project X
+
+Expected:
+
+same logical project recognized
+
+same stable Project Memory
+
+same repository index reused where valid
+
+same structural graph reused where valid
+
+same constraints
+
+same architectural decisions
+
+same active/incomplete task state
+
+same project routing configuration
+
+BUT:
+
+new model session receives its OWN Context Ledger.
+
+Never infer:
+
+"Claude saw file X in TREA"
+
+therefore:
+
+"GPT knows file X in VS Code."
+
+---
+
+# CROSS-IDE STATUS
+
+Report exactly one:
+
+CROSS_IDE_CONTINUITY = VERIFIED
+
+CROSS_IDE_CONTINUITY = PARTIAL
+
+CROSS_IDE_CONTINUITY = MISSING
+
+If VERIFIED:
+
+do not rewrite it.
+
+If PARTIAL:
+
+implement only missing pieces.
+
+If MISSING:
+
+implement identity + resume/handoff support before GO.
+
+---
+
+# 30. RESUME / HANDOFF
+
+A new IDE/session should receive compact project continuity without replaying entire chat history.
+
+Conceptual:
+
+SessionHandoff {
+project_id
+checkout_id
+branch
+git_head
+
+```
+current_objective
+active_tasks
+completed_work
+remaining_work
+
+decisions
+hard_constraints
+known_issues
+
+changed_files
+relevant_symbols
+
+latest_tests
+latest_validation
+
+last_verified_at
+```
+
+}
+
+Do NOT persist hidden reasoning.
+
+Persist only observable project facts/actions/results.
+
+---
+
+# 31. MEMORY INGESTION REALITY CHECK
+
+Verify whether current Project Memory automatically captures sufficient state for:
+
+* IDE handoff
+* active task recovery
+* completed work
+* unresolved work
+* decisions
+* constraints
+* user corrections
+* latest test state
+
+Do not claim seamless handoff solely because a memory table exists.
+
+If IDE/MCP cannot expose full chat history:
+
+do NOT scrape or infer hidden conversation state.
+
+Instead support observable structured lifecycle events:
+
+task started
+task completed
+task failed
+decision recorded
+constraint recorded
+files changed
+tests run
+validation passed/failed
+branch changed
+
+Provide clean ingestion hooks for host IDEs/agents where appropriate.
+
+---
+
+# 32. BRANCH ISOLATION
+
+Project memory must understand branch scope.
+
+Example:
+
+main:
+JWT still used
+
+feature-auth:
+JWT replaced with sessions
+
+Do not contaminate main with feature branch state.
+
+Support scopes such as:
+
+PROJECT_GLOBAL
+REPOSITORY
+CHECKOUT
+BRANCH
+TASK
+CONVERSATION
+MODEL_SESSION
+
+Memory should include where relevant:
+
+scope
+branch
+git_revision
+created_at
+last_verified_at
+status
+supersedes
+
+---
+
+# 33. MULTIPLE IDEs CONCURRENTLY
+
+The same project may be open in several IDEs simultaneously.
+
+Support:
+
+transactions
+revision/version numbers
+timestamps
+source_ide
+source_session
+optimistic concurrency
+
+Never silently overwrite newer state.
+
+Preserve conflicting events if necessary and reconcile deterministically or surface conflict.
+
+---
+
+# 34. PROJECT MOVE / CLONE / WORKTREE
+
+Filesystem path must not be the only identity.
+
+Handle:
+
+same directory + different IDE
+→ same checkout
+
+same repo + different worktree
+→ same project, different checkout
+
+same repo + different clone
+→ potentially same project, different checkout
+
+moved project directory
+→ preserve project identity when evidence is strong
+
+copied unrelated directory
+→ do not merge merely because filenames match
+
+When identity is ambiguous:
+
+prefer isolation over accidental contamination.
+
+---
+
+# 35. IDE SESSIONS DASHBOARD
+
+Show:
+
+IDE
+
+Project
+
+Checkout
+
+Branch
+
+Conversation
+
+Model Session
+
+Execution Mode
+
+IDE Model if detectable
+
+Router Model if applicable
+
+Active Task
+
+Last Heartbeat
+
+Example:
+
+TREA
+Project A
+IDE MODEL
+Claude
+
+VS Code
+Project A
+AUTO ROUTER
+Gateway → Qwen
+
+Clearly distinguish:
+
+PROJECT STATE RESTORED
+
+from:
+
+MODEL CONTEXT FRESH
+
+---
+
+# 36. PROJECTS PAGE
+
+Each project should show:
+
+Project Name
+
+Project ID
+
+Path / checkout
+
+Repository
+
+Branch
+
+Git HEAD
+
+Last Activity
+
+Active Task
+
+Last IDE
+
+Context Health
+
+Execution Mode
+
+Effective Routing Policy
+
+---
+
+# PROJECT DETAIL TABS
+
+OVERVIEW
+
+CONTEXT
+
+MEMORY
+
+ROUTING
+
+SESSIONS
+
+USAGE
+
+DIAGNOSTICS
+
+---
+
+# 37. CONTEXT INTELLIGENCE DASHBOARD
+
+This page works even when Router is disabled.
+
+Show:
+
+Context Confidence
+
+Safe to Implement
+
+Current Context Tokens
+
+Estimated Naive Context
+
+Tokens Avoided
+
+Known-to-Model
+
+New Context
+
+Changed Context
+
+Expired Context
+
+Expansion Passes
+
+Dependencies Found
+
+Missing Evidence
+
+Example:
+
+Context Confidence
+94%
+
+SAFE TO IMPLEMENT
+YES
+
+Initial Context
+1,840
+
+Expansion
++620
+
+Final
+2,460
+
+Naive Estimate
+31,400
+
+Saved
+92.2%
+
+---
+
+# 38. CONTEXT TRACE
+
+Optional diagnostics.
+
+Included:
+
+auth/service.py
+
+Reason:
+login endpoint calls validate_session()
+
+Included:
+
+auth/schema.py
+
+Reason:
+response contract
+
+Not included:
+
+README.md
+
+Reason:
+low relevance
+
+Never place all verbose trace information into normal LLM context.
+
+---
+
+# 39. PROJECT MEMORY DASHBOARD
+
+Show structured categories:
+
+Architecture
+
+Decisions
+
+Constraints
+
+Known Issues
+
+User Corrections
+
+Active Work
+
+Completed Work
+
+Recent Changes
+
+Show scope:
+
+PROJECT
+BRANCH
+TASK
+SESSION
+
+Allow advanced actions where appropriate:
+
+PIN
+
+UNPIN
+
+MARK STALE
+
+INVALIDATE
+
+But normal users should not need manual memory management.
+
+---
+
+# 40. AI PROVIDERS PAGE
+
+Only necessary for Hybrid/Auto Router users.
+
+Support:
+
+Add Provider
+
+Edit Provider
+
+Replace API Key
+
+Disable Provider
+
+Delete Provider
+
+Test Connection
+
+When IDE MODEL mode is active with no provider:
+
+show:
+
+"No external providers configured — not required in IDE Model mode."
+
+Do NOT display an error.
+
+---
+
+# 41. MODEL CATALOG
+
+Allow users to inspect/configure:
+
+Provider
+
+Remote Model ID
+
+Display Name
+
+Context Window
+
+Max Output
+
+Capabilities
+
+Quality Tier
+
+Pricing
+
+Latency Class
+
+Enabled
+
+Support custom model definitions.
+
+---
+
+# 42. USAGE & COST
+
+Separate Context metrics from Router metrics.
+
+Context:
+
+tokens avoided
+context reuse
+expansions
+memory hits
+dependency hits
+retrieval latency
+
+Router:
+
+provider calls
+model tokens
+cost
+retries
+escalations
+success rate
+
+Gateway:
+
+request latency
+streaming errors
+cancellations
+transport failures
+
+Do not combine them into misleading totals.
+
+---
+
+# ROUTING ECONOMICS
+
+Where enough data exists show:
+
+Cost if strongest model used always
+
+Actual cost
+
+Estimated savings
+
+Label estimates clearly.
+
+Never fabricate model pricing.
+
+Use:
+
+configured pricing
+provider-reported usage
+or clearly marked estimates
+
+---
+
+# 43. CONFIGURATION DATA MODEL
+
+Create durable backend entities conceptually supporting:
+
+Provider
+
+ProviderSecret
+
+ModelDefinition
+
+ModelCapability
+
+RoutingPolicy
+
+RoutingPolicyVersion
+
+ProjectRoutingOverride
+
+SessionRoutingOverride
+
+TaskRoutingOverride
+
+RoutingDecision
+
+RoutingAttempt
+
+IDESession
+
+ModelSession
+
+UsageEvent
+
+CostEvent
+
+Use repository conventions rather than blindly copying names.
+
+---
+
+# 44. ROUTING POLICY VERSIONING
+
+Routing policies must be versioned.
+
+Every RoutingDecision should reference the policy version used.
+
+This allows answering:
+
+"Why did this task use model X?"
+
+later.
+
+---
+
+# 45. FALLBACK SAFETY
+
+If preferred model unavailable:
+
+use only an explicitly permitted fallback.
+
+Record:
+
+fallback_reason
+
+Example:
+
+provider_unavailable
+
+Do not silently route to an expensive model the user never authorized.
+
+---
+
+# FALLBACK CYCLE VALIDATION
+
+Prevent configurations like:
+
+MiMo → Qwen
+
+Qwen → MiMo
+
+Validate routing graphs and escalation policies.
+
+---
+
+# 46. FAILURE ISOLATION
+
+Required:
+
+Router MCP crash
+→ Context MCP stays healthy
+
+Provider outage
+→ Context MCP stays healthy
+
+Gateway crash
+→ IDE MODEL remains usable
+
+Semantic index failure
+→ deterministic fallback
+
+Router disabled
+→ provider secrets not accessed
+
+Optional components must not break the core product.
+
+---
+
+# 47. PROCESS / DEPLOYMENT MODEL
+
+Conceptually:
+
+context-mcp
+
+dashboard/control-plane
+
+router-mcp
+optional
+
+model-gateway
+optional
+
+Do not require users to manually manage four terminals.
+
+Use the existing lifecycle manager where appropriate.
+
+Keep deployment local-first and lightweight.
+
+Avoid unnecessary microservices.
+
+---
+
+# 48. INSTALLATION PROFILES
+
+Support logical profiles:
+
+CORE
+
+Context MCP
+Dashboard
+
+ROUTING
+
+Context MCP
+Dashboard
+Router MCP
+
+FULL AUTO ROUTER
+
+Context MCP
+Dashboard
+Router MCP
+Model Gateway
+
+These can remain inside one repository/package.
+
+Separate deployability does NOT mean separate products/repositories are mandatory.
+
+---
+
+# 49. FEATURE DETECTION
+
+Dashboard should distinguish optional features from failures.
+
+Example:
+
+Context MCP
+✓ ACTIVE
+
+Router MCP
+NOT ENABLED
+
+Model Gateway
+NOT CONFIGURED
+
+Semantic Index
+AVAILABLE
+
+Do not show red errors for components intentionally disabled.
+
+---
+
+# 50. SECURITY BOUNDARY
+
+Maintain a strong boundary:
+
+CONTEXT DATA
+
+vs.
+
+PROVIDER SECRETS
+
+Context indexing/project memory should not require access to provider credentials.
+
+Add tests ensuring secrets never appear in:
+
+Context packages
+Memory
+Ledger
+Routing explanations
+Logs
+Diagnostics
+Frontend APIs
+Usage exports
+
+---
+
+# 51. SANITIZED DIAGNOSTICS
+
+Diagnostics export may include:
+
+versions
+
+enabled components
+
+project IDs
+
+model names
+
+provider types
+
+routing policy metadata
+
+errors
+
+index health
+
+context health
+
+sessions
+
+But NEVER:
+
+API keys
+
+authorization headers
+
+secret-store contents
+
+provider bearer tokens
+
+hidden reasoning
+
+raw credentials
+
+---
+
+# 52. BACKWARD COMPATIBILITY
+
+Preserve existing Context MCP tools unless absolutely necessary.
+
+Do not unnecessarily break:
+
+route
+build_context
+search
+get_symbol
+get_range
+get_related
+from_log
+capsule
+session
+usage
+directives
+
+If schema changes are necessary:
+
+version them
+
+or:
+
+provide compatibility adapters.
+
+Existing IDE integrations must remain operational.
+
+---
+
+# 53. PERFORMANCE
+
+Do not optimize prematurely.
+
+Measure:
+
+Context MCP latency
+
+Router latency
+
+Gateway overhead
+
+provider latency
+
+Dashboard API latency
+
+If subprocess overhead remains significant, record it as a limitation unless this phase actually needs to address it.
+
+Do not destabilize working Context retrieval merely to chase small latency improvements.
+
+---
+
+# 54. CORE-ONLY ACCEPTANCE
+
+Test with:
+
+ZERO PROVIDERS
+
+ZERO API KEYS
+
+Router MCP absent
+
+Gateway absent
+
+Expected:
+
+Context MCP starts.
+
+Indexing works.
+
+Memory works.
+
+Context Ledger works.
+
+Progressive expansion works.
+
+Dashboard works.
+
+IDE MODEL works.
+
+Cross-IDE project continuity works.
+
+No provider warning blocks the user.
+
+---
+
+# 55. HYBRID ACCEPTANCE
+
+Expected:
+
+IDE model remains primary.
+
+Router MCP available.
+
+Delegated subtask uses configured model.
+
+Result returns to primary IDE agent.
+
+Provider failure does not break Context MCP.
+
+Model-session isolation remains correct.
+
+---
+
+# 56. AUTO ROUTER ACCEPTANCE
+
+Only where Model Gateway is implemented and verified.
+
+Expected:
+
+IDE sends request to Gateway.
+
+Task Intelligence used.
+
+Router selects eligible model.
+
+Context budget adapts.
+
+Selected provider called.
+
+Streaming works.
+
+Tool calls preserved if required.
+
+Usage recorded.
+
+Fallback works.
+
+Cancellation works.
+
+No unnecessary strong-model first call occurs.
+
+If these cannot be demonstrated:
+
+do NOT mark Auto Router as implemented.
+
+---
+
+# 57. MODE SWITCHING ACCEPTANCE
+
+Project starts:
+
+IDE MODEL
+
+Switch to:
+
+HYBRID
+
+Expected:
+
+Project Memory preserved.
+
+Context Ledger semantics preserved.
+
+Only routing capability changes.
+
+Switch back:
+
+IDE MODEL
+
+Expected:
+
+Router no longer influences execution.
+
+No provider secret accessed for Context-only tasks.
+
+---
+
+# 58. CROSS-IDE ACCEPTANCE
+
+TREA:
+
+Project A
+IDE MODEL
+Claude
+
+Then:
+
+VS Code
+same Project A
+IDE MODEL
+GPT
+
+Expected:
+
+same Project Memory
+same project identity
+same index
+same structural graph where valid
+same project state
+
+BUT:
+
+new Model Session
+new known-to-model ledger
+
+Then switch Project A to:
+
+AUTO ROUTER
+
+Expected:
+
+project routing configuration shared across IDEs.
+
+Model knowledge remains isolated.
+
+---
+
+# 59. MULTI-PROJECT ACCEPTANCE
+
+Project A:
+AUTO ROUTER
+
+Project B:
+IDE MODEL
+
+Expected:
+
+zero memory leakage
+
+zero routing-policy leakage
+
+zero Context Ledger leakage
+
+zero model-session leakage
+
+---
+
+# 60. ROUTER FAILURE ACCEPTANCE
+
+Kill Router MCP.
+
+Expected:
+
+Context MCP healthy.
+
+IDE MODEL projects continue.
+
+HYBRID/AUTO projects report routing unavailable.
+
+No Context state corruption.
+
+---
+
+# 61. GATEWAY FAILURE ACCEPTANCE
+
+Gateway unavailable.
+
+Expected:
+
+Context Intelligence remains healthy.
+
+Dashboard reports gateway unavailable.
+
+Do NOT claim Auto Router is operational.
+
+---
+
+# 62. PROVIDER SECURITY TESTS
+
+Explicitly assert:
+
+API keys never appear in:
+
+logs
+Context package
+Project Memory
+Context Ledger
+routing history
+usage data
+diagnostics
+frontend API response
+exception output exposed to browser
+
+---
+
+# 63. DASHBOARD UX QUALITY
+
+The UI should feel like a premium developer tool.
+
+Requirements:
+
+clean hierarchy
+responsive layout
+high information density without clutter
+progressive disclosure
+strong empty states
+good loading states
+good error states
+accessible controls
+
+Avoid a generic admin-dashboard feel.
+
+Default user should mainly need:
+
+Project
+
+Context Health
+
+Execution Mode
+
+Current Model
+
+Router Status
+
+Savings
+
+Active Task
+
+Advanced controls can remain hidden unless requested.
+
+---
+
+# 64. DO NOT OVERENGINEER
+
+Avoid unnecessary:
+
+Kubernetes
+
+distributed databases
+
+message brokers
+
+cloud-only infrastructure
+
+microservice explosion
+
+expensive LLM classification
+
+The Context platform should remain suitable for a local coding IDE environment.
+
+---
+
+# 65. PHASE ORDER
+
+Work in this order.
+
+PHASE A — BASELINE
+
+Verify current Context Core.
+
+Do not modify it unless required.
+
+PHASE B — CROSS-IDE
+
+Verify project/model/session identity and continuity.
+
+Fix only missing pieces.
+
+PHASE C — CONTROL PLANE
+
+Extend existing Dashboard.
+
+Add configuration hierarchy and execution modes.
+
+PHASE D — ROUTER ARCHITECTURE
+
+Provider/model configuration.
+
+Router policy.
+
+Router MCP separation.
+
+PHASE E — HYBRID
+
+Implement safe delegated model execution.
+
+PHASE F — GATEWAY
+
+Implement true Auto Router only if practical and testable without destabilizing the core.
+
+Do not allow Gateway work to block a production-quality Context + Dashboard + Router MCP architecture.
+
+---
+
+# 66. IMPLEMENTATION RULE
+
+Do not stop at architecture documents.
+
+Implement working code.
+
+For each phase:
+
+inspect
+design
+implement
+test
+fix
+measure
+continue
+
+But if a feature would destabilize the verified core:
+
+prefer a clean interface and defer the risky implementation.
+
+Never fake a completed capability.
+
+Clearly classify:
+
+IMPLEMENTED
+
+PARTIAL
+
+READY FOR NEXT PHASE
+
+NOT IMPLEMENTED
+
+---
+
+# 67. DOCUMENTATION
+
+Create/update:
+
+docs/DASHBOARD_CONTROL_PLANE.md
+
+docs/COMPONENT_ARCHITECTURE.md
+
+docs/CONTEXT_MCP.md
+
+docs/ROUTER_MCP.md
+
+docs/MODEL_GATEWAY.md
+
+docs/MODEL_EXECUTION_MODES.md
+
+docs/PROVIDER_CONFIGURATION.md
+
+docs/MODEL_ROUTING_POLICY.md
+
+docs/SECRET_STORAGE.md
+
+docs/CROSS_IDE_CONFIGURATION.md
+
+Do not duplicate existing documentation unnecessarily.
+
+Update existing docs when more appropriate.
+
+---
+
+# 68. FINAL ACCEPTANCE REPORT
+
+Create:
+
+DASHBOARD_ROUTER_ARCHITECTURE_ACCEPTANCE.md
+
+Required structure:
+
+# 1. Executive Summary
+
+# 2. Verified Context Core Baseline
+
+# 3. Regression Results
+
+# 4. Component Architecture
+
+# 5. Context MCP Independence
+
+# 6. Cross-IDE Continuity
+
+State:
+
+VERIFIED / PARTIAL / MISSING
+
+with actual test evidence.
+
+# 7. Dashboard / Control Plane
+
+# 8. Execution Modes
+
+IDE MODEL
+HYBRID
+AUTO ROUTER
+
+For each state:
+
+IMPLEMENTED
+PARTIAL
+NOT IMPLEMENTED
+
+# 9. Router MCP
+
+# 10. Model Gateway
+
+# 11. Provider Configuration
+
+# 12. Secret Security
+
+# 13. Model Catalog
+
+# 14. Routing Policy
+
+# 15. Project / Session / Task Overrides
+
+# 16. Failure Isolation
+
+# 17. Usage / Cost / Observability
+
+# 18. Tests
+
+# 19. Remaining Limitations
+
+# 20. Deferred Features
+
+# 21. Production Risks
+
+# 22. Final Verdict
+
+Return:
+
+GO
+
+or:
+
+NO-GO
+
+Do not mark GO based on documentation alone.
+
+---
+
+# 69. FINAL NO-GO CONDITIONS
+
+Return NO-GO if any of these are true:
+
+* Router MCP becomes required for Context MCP.
+* API keys become required for IDE MODEL mode.
+* Context retrieval materially regresses.
+* Context savings materially regress without justified quality improvement.
+* Model-session knowledge leaks between sessions.
+* Project data leaks across projects.
+* Branch state contaminates another branch.
+* Project routing config is stored only inside one IDE.
+* Router failure breaks Context MCP.
+* Provider secrets enter Context data.
+* Auto Router is claimed without control of the primary model request.
+* Cross-IDE continuity is claimed without end-to-end evidence.
+* Existing Context tests regress.
+* Dashboard requires Router to function.
+* Context-only users receive provider errors/warnings as blockers.
+
+---
+
+# FINAL ACCEPTANCE STATEMENTS
+
+The architecture is acceptable only if all of the following are demonstrably true:
+
+1.
+
+"I can use Context Intelligence with the LLM already configured in my IDE without entering any external API key."
+
+2.
+
+"Context Intelligence works if Router MCP is disabled or not installed."
+
+3.
+
+"I can optionally enable model routing later."
+
+4.
+
+"Router MCP does not duplicate Context Intelligence."
+
+5.
+
+"Project knowledge persists across supported IDEs."
+
+6.
+
+"New model sessions do not inherit false known-to-model state."
+
+7.
+
+"Projects and branches remain isolated."
+
+8.
+
+"Provider secrets never enter Context Intelligence."
+
+9.
+
+"IDE MODEL remains the default."
+
+10.
+
+"Hybrid mode is correctly described as delegation."
+
+11.
+
+"True Auto Router is only claimed if Gateway/integration controls the primary model request."
+
+12.
+
+"A project can independently select IDE MODEL, HYBRID, or AUTO ROUTER."
+
+13.
+
+"Turning routing off returns the platform to clean Context-only operation."
+
+14.
+
+"Router or provider failure cannot break Context-only users."
+
+15.
+
+"The previously verified Context quality and token savings have not regressed."
+
+---
+
+# FINAL PRODUCT EXPERIENCE
+
+The intended product experience is:
+
+INSTALL
+↓
+Context Intelligence starts
+↓
+User keeps existing IDE model
+↓
+No API key required
+↓
+Context MCP reduces unnecessary context
+↓
+Project state survives IDE changes
+↓
+Dashboard shows context health and savings
+
+OPTIONALLY:
+
+User enables Model Routing
+↓
+Adds provider(s)
+↓
+Adds/selects models
+↓
+Chooses HYBRID or AUTO ROUTER
+↓
+Router MCP uses existing Context Intelligence
+↓
+Cheap/simple work may use economical models
+↓
+Complex/risky work may use stronger models
+↓
+Model usage, routing reason, cost, and escalation are visible
+
+And when true Auto Router is supported:
+
+IDE
+↓
+Model Gateway
+↓
+Context Intelligence + Router
+↓
+Best eligible model
+↓
+Provider
+
+The governing architectural principle is:
+
+CONTEXT INTELLIGENCE IS THE PRODUCT CORE.
+
+MODEL ROUTING IS AN OPTIONAL EXECUTION LAYER.
+
+THE DASHBOARD IS THE SHARED CONTROL PLANE.
+
+DO NOT COMPROMISE THE VERIFIED CONTEXT CORE IN ORDER TO IMPLEMENT ROUTING.

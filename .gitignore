@@ -1,0 +1,33 @@
+# Context Agent runtime state (created inside target projects)
+.context/
+
+# Python caches and local test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+coverage/
+htmlcov/
+.coverage
+
+# Local logs, databases, locks, and generated reports
+*.log
+*.db
+*.db-shm
+*.db-wal
+*.lock
+baseline_*.json
+baseline_*.txt
+
+# Local editor and machine configuration
+.claude/settings.local.json
+.kilo/
+.DS_Store
+Thumbs.db
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/

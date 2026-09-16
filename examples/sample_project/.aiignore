@@ -1,0 +1,61 @@
+# Context Agent — .aiignore
+# Bu dosyadaki pattern'ler indexlenmez
+
+# Context Agent çıktıları
+.context/
+
+# Paket yöneticileri
+node_modules/
+vendor/
+.venv/
+venv/
+env/
+__pycache__/
+
+# Build çıktıları
+dist/
+build/
+out/
+.next/
+target/
+*.class
+*.pyc
+
+# Binary & medya
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+*.zip
+*.tar.gz
+*.woff
+*.woff2
+
+# Üretilmiş kod
+# NOT: migrations/ indexlenir; şema/contract bilgisi retrieval için kritiktir.
+*.generated.*
+*_pb2.py
+*.g.dart
+
+# Gizli bilgiler
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Lock dosyaları
+package-lock.json
+yarn.lock
+Cargo.lock
+poetry.lock
+
+# Test snapshot'ları
+__snapshots__/
+*.snap
+
+# Log dosyaları
+*.log
+logs/

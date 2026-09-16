@@ -1,0 +1,42 @@
+[
+  {
+    "name": "auth token verification",
+    "task": "verify an authentication token",
+    "expected_files": ["auth/tokens.py", "auth/service.py"]
+  },
+  {
+    "name": "rate limiting login endpoint",
+    "task": "add rate limiting to the login endpoint",
+    "expected_files": ["auth/service.py", "auth/decorators.py"]
+  },
+  {
+    "name": "refactor user model",
+    "task": "refactor the user model",
+    "expected_files": ["auth/models.py"]
+  },
+  {
+    "name": "create new invoice",
+    "task": "create a new invoice for a customer",
+    "expected_files": ["payments/service.py", "payments/models.py"]
+  },
+  {
+    "name": "process refund",
+    "task": "process a refund for an invoice",
+    "expected_files": ["payments/service.py", "payments/models.py"]
+  },
+  {
+    "name": "track analytics event",
+    "task": "track a new analytics event",
+    "expected_files": ["analytics/events.py"]
+  },
+  {
+    "name": "database transaction",
+    "task": "wrap a write in a database transaction",
+    "expected_files": ["db/connection.py"]
+  },
+  {
+    "name": "logger factory",
+    "task": "get a configured logger",
+    "expected_files": ["utils/logging.py"]
+  }
+]

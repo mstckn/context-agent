@@ -1,0 +1,8 @@
+[project]
+name = "sample-project"
+version = "0.1.0"
+description = "Representative testbed project for Context Agent evaluations"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
