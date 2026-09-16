@@ -58,6 +58,7 @@ Ledger/memory state survives both directions.
 
 1. `python -m pytest tests/ -q` in the engine repo — expect all green.
 2. Run `scripts/eval.py` against your eval fixtures — hit rate and top-1
-   must not regress (quality gates per `CONTEXT_QUALITY_EVALUATION.md`).
+   must not regress. Keep evaluation inputs and results with the change when
+   a retrieval behavior change needs to be reviewed.
 3. Two consecutive `build_context` calls with the same task: the second
    should report `known_count > 0` in `context_reuse`.
