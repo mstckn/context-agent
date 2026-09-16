@@ -193,5 +193,4 @@ Issues, focused pull requests, reproducible evaluations, and documentation impro
 
 ## 📄 License
 
-See the repository for the current licensing status before redistributing or embedding the project.
-
+This project is released under the [MIT License](LICENSE). You may use, modify, and redistribute it subject to the license terms.
